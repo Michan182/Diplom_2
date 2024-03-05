@@ -1,0 +1,1 @@
+{"uuid": "06b95df3-2a62-4002-8773-ca0197f8f94f", "children": ["e58db40c-e755-495e-a261-8ebe36ed5e60"], "befores": [{"name": "register_new_user_and_return_access_token", "status": "passed", "start": 1709406078616, "stop": 1709406079175}], "start": 1709406078616, "stop": 1709406080011}
