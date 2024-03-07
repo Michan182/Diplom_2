@@ -1,28 +1,18 @@
 import pytest
 import requests
-from faker import Faker
-import string
-import random
+import urls
+from helpers import Helpers
+import handlers
 
 @pytest.fixture()
 def register_new_user_and_return_login_password():
-    # метод генерирует строку, состоящую только из букв нижнего регистра, в качестве параметра передаём длину строки
-    def generate_random_string(length):
-        letters = string.ascii_lowercase
-        random_string = ''.join(random.choice(letters) for i in range(length))
-        return random_string
-
-    def generate_random_email():
-        fake = Faker()
-        return fake.email()
-
     # создаём список, чтобы метод мог его вернуть
     login_pass = []
-
+    helpers = Helpers()
     # генерируем логин, пароль и имя курьера
-    email = generate_random_email()
-    password = generate_random_string(10)
-    name = generate_random_string(10)
+    email = helpers.generate_random_email()
+    password = helpers.generate_random_string(10)
+    name = helpers.generate_random_string(10)
 
     # собираем тело запроса
     payload = {
@@ -32,7 +22,7 @@ def register_new_user_and_return_login_password():
     }
 
     # отправляем запрос на регистрацию нового пользователя и сохраняем ответ в переменную response
-    response = requests.post('https://stellarburgers.nomoreparties.site/api/auth/register', data=payload)
+    response = requests.post(f'{urls.HOME_URL}{handlers.CREATE_USER}', data=payload)
 
     # если регистрация прошла успешно (код ответа 200), добавляем в список логин и пароль курьера
     if response.status_code == 200:
@@ -45,27 +35,15 @@ def register_new_user_and_return_login_password():
 
 @pytest.fixture()
 def generate_new_user_data_and_return():
-    # метод генерирует строку, состоящую только из букв нижнего регистра, в качестве параметра передаём длину строки
-    def generate_random_string(length):
-        letters = string.ascii_lowercase
-        random_string = ''.join(random.choice(letters) for i in range(length))
-        return random_string
-
-    def generate_random_email():
-        fake = Faker()
-        return fake.email()
-
-    def generate_random_name():
-        fake = Faker()
-        return fake.name()
+    helpers = Helpers()
 
     # создаём список, чтобы метод мог его вернуть
     user_data = []
 
     # генерируем логин, пароль и имя курьера
-    email = generate_random_email()
-    password = generate_random_string(10)
-    name = generate_random_name()
+    email = helpers.generate_random_email()
+    password = helpers.generate_random_string(10)
+    name = helpers.generate_random_name()
 
     user_data.append(email)
     user_data.append(password)
@@ -77,19 +55,12 @@ def generate_new_user_data_and_return():
 
 @pytest.fixture
 def register_new_user_and_return_access_token():
-    def generate_random_string(length):
-        letters = string.ascii_lowercase
-        random_string = ''.join(random.choice(letters) for i in range(length))
-        return random_string
-
-    def generate_random_email():
-        fake = Faker()
-        return fake.email()
+    helpers = Helpers()
 
     # генерируем логин, пароль и имя курьера
-    email = generate_random_email()
-    password = generate_random_string(10)
-    name = generate_random_string(10)
+    email = helpers.generate_random_email()
+    password = helpers.generate_random_string(10)
+    name = helpers.generate_random_name()
 
     # собираем тело запроса
     payload = {
@@ -99,7 +70,7 @@ def register_new_user_and_return_access_token():
     }
 
     # отправляем запрос на регистрацию нового пользователя
-    response = requests.post('https://stellarburgers.nomoreparties.site/api/auth/register', data=payload)
+    response = requests.post(f'{urls.HOME_URL}{handlers.CREATE_USER}', data=payload)
 
     # если регистрация прошла успешно (код ответа 200), входим пользователя и возвращаем токен
     if response.status_code == 200:
@@ -107,7 +78,7 @@ def register_new_user_and_return_access_token():
             "email": email,
             "password": password
         }
-        login_response = requests.post('https://stellarburgers.nomoreparties.site/api/auth/login', data=login_data)
+        login_response = requests.post(f'{urls.HOME_URL}{handlers.LOGIN_USER}', data=login_data)
 
         # извлекаем токен из ответа на вход
         token = login_response.json().get("accessToken")
